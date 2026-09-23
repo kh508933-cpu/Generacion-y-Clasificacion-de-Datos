@@ -1,0 +1,5 @@
+1;Computador;350000
+2;Teclado;75000
+3;Mouse;45000
+4;Monitor;520000
+5;Impresora;410000

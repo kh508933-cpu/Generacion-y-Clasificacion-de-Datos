@@ -1,0 +1,19 @@
+Conclusión
+
+Durante el desarrollo de la primera entrega se practicaron conceptos
+fundamentales de programación en Java relacionados con la creación y manejo
+de archivos de texto, generación de información pseudoaleatoria, uso de
+métodos, estructuras de repetición, arreglos y manejo básico de excepciones.
+
+El proyecto permite comprender cómo una aplicación puede generar información
+que posteriormente será procesada por otro programa. Esta habilidad puede
+aplicarse en contextos profesionales donde sea necesario preparar datos de
+prueba, automatizar procesos de generación de información y validar el
+funcionamiento de aplicaciones antes de utilizar datos reales.
+
+Una de las principales dificultades consiste en mantener coherencia entre
+los archivos generados. Por ejemplo, los identificadores de productos usados
+en los archivos de ventas deben corresponder con productos existentes, y la
+información de los vendedores debe mantener una relación lógica con sus
+archivos de ventas. La solución implementada busca conservar esta coherencia
+mediante valores controlados y generación automática de los datos.

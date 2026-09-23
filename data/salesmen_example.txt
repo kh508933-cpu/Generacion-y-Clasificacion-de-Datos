@@ -1,0 +1,3 @@
+CC;1000000001;Karen;Morales
+CC;1000000002;Laura;Rodriguez
+CC;1000000003;Sofia;Gomez
