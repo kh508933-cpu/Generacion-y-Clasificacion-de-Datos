@@ -1,0 +1,50 @@
+ENTREGA 2 – VERSIÓN PRELIMINAR DEL PROYECTO
+
+Proyecto: Generación y Clasificación de Datos  
+Estudiante: Karen Dayana Morales
+
+1. ESTADO ACTUAL DEL PROYECTO
+
+El proyecto cuenta con una versión preliminar funcional que permite generar archivos de información y procesar datos de vendedores, productos y ventas.
+
+Actualmente se cuenta con las siguientes clases principales:
+
+- GenerateInfoFiles.java
+- main.java
+
+La clase GenerateInfoFiles permite generar archivos de datos de productos, vendedores y ventas.
+
+La clase main permite leer la información generada, procesar las ventas y generar reportes de vendedores y productos.
+
+2. FUNCIONALIDADES IMPLEMENTADAS
+
+- Generación de información de productos.
+- Generación de información de vendedores.
+- Generación de archivos de ventas.
+- Lectura de los archivos de productos.
+- Lectura de los archivos de vendedores.
+- Lectura de los archivos de ventas.
+- Cálculo de los ingresos de los vendedores.
+- Cálculo de las cantidades vendidas por producto.
+- Generación del reporte de vendedores.
+- Generación del reporte de productos.
+- Validación básica de los archivos y de los datos ingresados.
+- Creación automática de la carpeta de reportes.
+
+3. PARTES PENDIENTES
+
+Al tratarse de una versión preliminar, quedan pendientes algunos aspectos que serán completados y refinados durante la evolución del proyecto:
+
+- Realizar pruebas completas con diferentes conjuntos de datos.
+- Verificar los resultados de los reportes con los datos reales de prueba.
+- Completar y revisar la presentación final de los reportes.
+- Realizar pruebas adicionales para casos de error y datos inválidos.
+- Revisar y mejorar la documentación del proyecto.
+- Realizar los ajustes que sean necesarios de acuerdo con las observaciones del docente.
+- Integrar cualquier funcionalidad adicional que sea solicitada para la versión final.
+
+4. CONCLUSIÓN
+
+La presente entrega corresponde a una versión preliminar del proyecto completo. Las funcionalidades principales de generación, lectura, procesamiento y clasificación de información ya se encuentran desarrolladas.
+
+Los elementos indicados como pendientes serán revisados, probados y ajustados durante las siguientes etapas del proyecto hasta obtener la versión final.
