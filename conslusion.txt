@@ -1,19 +1,11 @@
-Conclusión
+CONCLUSIÓN
 
-Durante el desarrollo de la primera entrega se practicaron conceptos
-fundamentales de programación en Java relacionados con la creación y manejo
-de archivos de texto, generación de información pseudoaleatoria, uso de
-métodos, estructuras de repetición, arreglos y manejo básico de excepciones.
+Durante el desarrollo del proyecto Generación y Clasificación de Datos, se aplicaron los conceptos fundamentales de programación en Java 8, como el uso de clases, métodos, variables, estructuras de control, colecciones, arreglos y manejo de excepciones. También se trabajó con la lectura y escritura de archivos de texto, el procesamiento de información y la clasificación de datos mediante criterios de ordenamiento.
 
-El proyecto permite comprender cómo una aplicación puede generar información
-que posteriormente será procesada por otro programa. Esta habilidad puede
-aplicarse en contextos profesionales donde sea necesario preparar datos de
-prueba, automatizar procesos de generación de información y validar el
-funcionamiento de aplicaciones antes de utilizar datos reales.
+Se desarrollaron dos clases principales: `GenerateInfoFiles`, encargada de generar los archivos de entrada con información de vendedores, productos y ventas, y `main`, responsable de leer y procesar dichos archivos para calcular el valor total vendido por cada vendedor y la cantidad de unidades vendidas por producto. Finalmente, se generan reportes organizados de mayor a menor, facilitando la interpretación de los resultados.
 
-Una de las principales dificultades consiste en mantener coherencia entre
-los archivos generados. Por ejemplo, los identificadores de productos usados
-en los archivos de ventas deben corresponder con productos existentes, y la
-información de los vendedores debe mantener una relación lógica con sus
-archivos de ventas. La solución implementada busca conservar esta coherencia
-mediante valores controlados y generación automática de los datos.
+En el ámbito profesional, estos conocimientos son útiles para automatizar procesos, organizar información comercial, consolidar datos provenientes de diferentes archivos y generar reportes que apoyen la toma de decisiones. En áreas como la Ingeniería Industrial y la logística, este tipo de soluciones puede contribuir al seguimiento de las ventas, el control de productos y el análisis del desempeño comercial.
+
+Entre las principales dificultades se encontraron la correcta organización de los archivos de entrada, la correspondencia entre los identificadores de vendedores y productos, la validación de los datos y el cálculo adecuado de los resultados. Estas situaciones permitieron comprender la importancia de verificar la información antes de procesarla y de estructurar el código de manera clara y ordenada.
+
+En conclusión, el proyecto permitió fortalecer las habilidades de programación en Java 8, el manejo de archivos y el procesamiento de datos, así como comprender la importancia de desarrollar soluciones que automaticen tareas y transformen información en resultados útiles. También permitió reconocer la necesidad de documentar el código, validar los datos y mantener una estructura organizada para facilitar el mantenimiento y la mejora del programa...
