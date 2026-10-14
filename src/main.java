@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -5,501 +6,335 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Programa principal del proyecto Generacion y Clasificacion de Datos.
- *
- * Lee los archivos generados por GenerateInfoFiles y crea:
- *
- * 1. Reporte de vendedores.
- * 2. Reporte de productos.
- *
- * @author Karen Dayana Morales
- * @version 1.0
- */
 public class main {
 
-    private static final String DATA_FOLDER = "data";
-    private static final String REPORT_FOLDER = "reports";
+    private static final String CARPETA = "data";
 
-    /**
-     * Metodo principal.
-     *
-     * @param args argumentos de ejecucion, no utilizados
-     */
+    static class Vendedor {
+        String tipoDocumento;
+        String numeroDocumento;
+        String nombres;
+        String apellidos;
+        double totalVendido;
+
+        Vendedor(String tipo, String numero, String nombres,
+                String apellidos) {
+            this.tipoDocumento = tipo;
+            this.numeroDocumento = numero;
+            this.nombres = nombres;
+            this.apellidos = apellidos;
+            this.totalVendido = 0;
+        }
+
+        String nombreCompleto() {
+            return nombres + " " + apellidos;
+        }
+    }
+
+    static class Producto {
+        String id;
+        String nombre;
+        double precio;
+        int cantidadVendida;
+
+        Producto(String id, String nombre, double precio) {
+            this.id = id;
+            this.nombre = nombre;
+            this.precio = precio;
+            this.cantidadVendida = 0;
+        }
+    }
+
     public static void main(String[] args) {
-
         try {
-
-            Map<Long, Seller> sellers = readSellers();
-            Map<Integer, Product> products = readProducts();
-
-            processSalesFiles(sellers, products);
-
-            createSellerReport(sellers);
-            createProductReport(products);
-
-            System.out.println("==============================================");
-            System.out.println("REPORTES GENERADOS CORRECTAMENTE");
-            System.out.println("==============================================");
-
-        } catch (Exception exception) {
-
-            System.out.println("==============================================");
+            generarReportes();
+            System.out.println("REPORTES GENERADOS CON EXITO");
+            System.out.println("Archivo: data/reporte_vendedores.txt");
+            System.out.println("Archivo: data/reporte_productos.txt");
+        } catch (IOException | IllegalArgumentException e) {
             System.out.println("ERROR AL GENERAR LOS REPORTES");
-            System.out.println("Detalle: " + exception.getMessage());
-            System.out.println("==============================================");
+            System.out.println("Detalle: " + e.getMessage());
         }
     }
 
-    /**
-     * Lee la informacion de los vendedores.
-     *
-     * @return mapa de vendedores
-     * @throws IOException si ocurre un error de lectura
-     */
-    private static Map<Long, Seller> readSellers()
-            throws IOException {
+    public static void generarReportes() throws IOException {
+        File carpeta = new File(CARPETA);
 
-        Map<Long, Seller> sellers = new HashMap<>();
-
-        File file = new File(
-                DATA_FOLDER
-                + File.separator
-                + "salesmen.txt"
-        );
-
-        if (!file.exists()) {
+        if (!carpeta.exists() || !carpeta.isDirectory()) {
             throw new IOException(
-                    "No existe el archivo salesmen.txt");
+                "No existe la carpeta data. Ejecuta primero GenerateInfoFiles."
+            );
         }
 
-        try (BufferedReader reader =
-                new BufferedReader(new FileReader(file))) {
+        Map<String, Vendedor> vendedores = cargarVendedores();
+        Map<String, Producto> productos = cargarProductos();
 
-            String line;
+        procesarVentas(vendedores, productos);
 
-            while ((line = reader.readLine()) != null) {
-
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-
-                String[] parts = line.split(";");
-
-                if (parts.length != 4) {
-                    throw new IOException(
-                            "Formato incorrecto en salesmen.txt: "
-                            + line);
-                }
-
-                long document =
-                        Long.parseLong(parts[1]);
-
-                String name = parts[2];
-                String lastName = parts[3];
-
-                Seller seller =
-                        new Seller(
-                                document,
-                                name,
-                                lastName
-                        );
-
-                sellers.put(document, seller);
-            }
-        }
-
-        return sellers;
+        generarReporteVendedores(vendedores);
+        generarReporteProductos(productos);
     }
 
-    /**
-     * Lee la informacion de los productos.
-     *
-     * @return mapa de productos
-     * @throws IOException si ocurre un error de lectura
-     */
-    private static Map<Integer, Product> readProducts()
+    private static Map<String, Vendedor> cargarVendedores()
             throws IOException {
 
-        Map<Integer, Product> products = new HashMap<>();
+        Map<String, Vendedor> vendedores = new HashMap<String, Vendedor>();
+        File archivo = new File(CARPETA, "salesmen.txt");
 
-        File file = new File(
-                DATA_FOLDER
-                + File.separator
-                + "products.txt"
-        );
+        try (BufferedReader lector =
+                new BufferedReader(new FileReader(archivo))) {
 
-        if (!file.exists()) {
-            throw new IOException(
-                    "No existe el archivo products.txt");
-        }
+            String linea;
 
-        try (BufferedReader reader =
-                new BufferedReader(new FileReader(file))) {
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-
-                if (line.trim().isEmpty()) {
+            while ((linea = lector.readLine()) != null) {
+                if (linea.trim().isEmpty()) {
                     continue;
                 }
 
-                String[] parts = line.split(";");
+                String[] datos = linea.split(";", -1);
 
-                if (parts.length != 3) {
+                if (datos.length < 4) {
                     throw new IOException(
-                            "Formato incorrecto en products.txt: "
-                            + line);
+                        "Registro de vendedor invalido: " + linea
+                    );
                 }
 
-                int id =
-                        Integer.parseInt(parts[0]);
+                Vendedor vendedor = new Vendedor(
+                    datos[0].trim(),
+                    datos[1].trim(),
+                    datos[2].trim(),
+                    datos[3].trim()
+                );
 
-                String name = parts[1];
-
-                double price =
-                        Double.parseDouble(parts[2]);
-
-                if (price < 0) {
-                    throw new IOException(
-                            "Precio negativo para producto "
-                            + id);
-                }
-
-                products.put(
-                        id,
-                        new Product(
-                                id,
-                                name,
-                                price
-                        )
+                vendedores.put(
+                    vendedor.tipoDocumento + ";" + vendedor.numeroDocumento,
+                    vendedor
                 );
             }
         }
 
-        return products;
+        return vendedores;
     }
 
-    /**
-     * Procesa todos los archivos de ventas.
-     *
-     * @param sellers vendedores disponibles
-     * @param products productos disponibles
-     * @throws IOException si existe informacion incorrecta
-     */
-    private static void processSalesFiles(
-            Map<Long, Seller> sellers,
-            Map<Integer, Product> products)
+    private static Map<String, Producto> cargarProductos()
             throws IOException {
 
-        File folder = new File(DATA_FOLDER);
+        Map<String, Producto> productos = new HashMap<String, Producto>();
+        File archivo = new File(CARPETA, "products.txt");
 
-        File[] files = folder.listFiles();
+        try (BufferedReader lector =
+                new BufferedReader(new FileReader(archivo))) {
 
-        if (files == null) {
-            throw new IOException(
-                    "No fue posible leer la carpeta data.");
+            String linea;
+
+            while ((linea = lector.readLine()) != null) {
+                if (linea.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] datos = linea.split(";", -1);
+
+                if (datos.length < 3) {
+                    throw new IOException(
+                        "Registro de producto invalido: " + linea
+                    );
+                }
+
+                try {
+                    Producto producto = new Producto(
+                        datos[0].trim(),
+                        datos[1].trim(),
+                        Double.parseDouble(datos[2].trim())
+                    );
+
+                    productos.put(producto.id, producto);
+
+                } catch (NumberFormatException e) {
+                    throw new IOException(
+                        "Precio de producto invalido: " + linea
+                    );
+                }
+            }
         }
 
-        for (File file : files) {
+        return productos;
+    }
 
-            String fileName = file.getName();
+    private static void procesarVentas(
+            Map<String, Vendedor> vendedores,
+            Map<String, Producto> productos) throws IOException {
 
-            if (!file.isFile()
-                    || !fileName.startsWith("sales_")
-                    || !fileName.endsWith(".txt")) {
+        File carpeta = new File(CARPETA);
+        File[] archivos = carpeta.listFiles();
+
+        if (archivos == null) {
+            throw new IOException("No se pudieron leer los archivos de data.");
+        }
+
+        for (File archivo : archivos) {
+            String nombre = archivo.getName();
+
+            if (!archivo.isFile()
+                    || !nombre.startsWith("sales_")
+                    || !nombre.endsWith(".txt")) {
                 continue;
             }
 
-            processSingleSalesFile(
-                    file,
-                    sellers,
-                    products
-            );
-        }
-    }
+            try (BufferedReader lector =
+                    new BufferedReader(new FileReader(archivo))) {
 
-    /**
-     * Procesa el archivo de ventas de un vendedor.
-     *
-     * @param file archivo de ventas
-     * @param sellers vendedores
-     * @param products productos
-     * @throws IOException si el formato es incorrecto
-     */
-    private static void processSingleSalesFile(
-            File file,
-            Map<Long, Seller> sellers,
-            Map<Integer, Product> products)
-            throws IOException {
+                String primeraLinea = lector.readLine();
 
-        try (BufferedReader reader =
-                new BufferedReader(new FileReader(file))) {
-
-            String firstLine = reader.readLine();
-
-            if (firstLine == null) {
-                throw new IOException(
-                        "Archivo vacio: "
-                        + file.getName());
-            }
-
-            String[] sellerData =
-                    firstLine.split(";");
-
-            if (sellerData.length != 2) {
-                throw new IOException(
-                        "Primera linea incorrecta en "
-                        + file.getName());
-            }
-
-            long sellerId =
-                    Long.parseLong(sellerData[1]);
-
-            Seller seller = sellers.get(sellerId);
-
-            if (seller == null) {
-                throw new IOException(
-                        "El vendedor "
-                        + sellerId
-                        + " no existe en salesmen.txt");
-            }
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-
-                if (line.trim().isEmpty()) {
+                if (primeraLinea == null) {
                     continue;
                 }
 
-                String[] parts = line.split(";");
+                String[] identificacion =
+                        primeraLinea.trim().split(";", -1);
 
-                if (parts.length < 2) {
+                if (identificacion.length < 2) {
                     throw new IOException(
-                            "Formato incorrecto en "
-                            + file.getName()
-                            + ": "
-                            + line);
+                        "Identificacion de vendedor invalida en " + nombre
+                    );
                 }
 
-                int productId =
-                        Integer.parseInt(parts[0]);
+                String clave = identificacion[0].trim()
+                        + ";" + identificacion[1].trim();
 
-                int quantity =
-                        Integer.parseInt(parts[1]);
+                Vendedor vendedor = vendedores.get(clave);
 
-                if (quantity < 0) {
+                if (vendedor == null) {
                     throw new IOException(
-                            "Cantidad negativa en "
-                            + file.getName());
+                        "El vendedor " + clave
+                        + " no existe en salesmen.txt"
+                    );
                 }
 
-                Product product =
-                        products.get(productId);
+                String linea;
 
-                if (product == null) {
-                    throw new IOException(
-                            "El producto "
-                            + productId
-                            + " no existe.");
+                while ((linea = lector.readLine()) != null) {
+                    if (linea.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    String[] datos = linea.split(";", -1);
+
+                    if (datos.length < 2) {
+                        throw new IOException(
+                            "Venta invalida en " + nombre + ": " + linea
+                        );
+                    }
+
+                    String idProducto = datos[0].trim();
+
+                    if (idProducto.isEmpty()) {
+                        continue;
+                    }
+
+                    try {
+                        int cantidad =
+                                Integer.parseInt(datos[1].trim());
+
+                        if (cantidad < 0) {
+                            throw new IOException(
+                                "Cantidad negativa en " + nombre
+                            );
+                        }
+
+                        Producto producto = productos.get(idProducto);
+
+                        if (producto == null) {
+                            throw new IOException(
+                                "El producto " + idProducto
+                                + " no existe en products.txt"
+                            );
+                        }
+
+                        vendedor.totalVendido +=
+                                producto.precio * cantidad;
+
+                        producto.cantidadVendida += cantidad;
+
+                    } catch (NumberFormatException e) {
+                        throw new IOException(
+                            "Cantidad invalida en " + nombre + ": " + linea
+                        );
+                    }
                 }
-
-                seller.addRevenue(
-                        product.getPrice()
-                        * quantity
-                );
-
-                product.addQuantity(quantity);
             }
         }
     }
 
-    /**
-     * Crea el reporte de vendedores.
-     *
-     * @param sellers vendedores procesados
-     * @throws IOException si ocurre un error de escritura
-     */
-    private static void createSellerReport(
-            Map<Long, Seller> sellers)
-            throws IOException {
+    private static void generarReporteVendedores(
+            Map<String, Vendedor> vendedores) throws IOException {
 
-        createReportFolder();
+        List<Vendedor> lista =
+                new ArrayList<Vendedor>(vendedores.values());
 
-        List<Seller> sellerList =
-                new ArrayList<>(sellers.values());
+        Collections.sort(lista, new Comparator<Vendedor>() {
+            @Override
+            public int compare(Vendedor a, Vendedor b) {
+                return Double.compare(b.totalVendido, a.totalVendido);
+            }
+        });
 
-        sellerList.sort(
-                Comparator.comparingDouble(
-                        Seller::getRevenue
-                ).reversed()
-        );
+        File archivo = new File(CARPETA, "reporte_vendedores.txt");
 
-        File file = new File(
-                REPORT_FOLDER
-                + File.separator
-                + "reporte_vendedores.csv"
-        );
+        try (BufferedWriter escritor =
+                new BufferedWriter(new FileWriter(archivo))) {
 
-        try (BufferedWriter writer =
-                new BufferedWriter(new FileWriter(file))) {
+            escritor.write("VENDEDOR;DOCUMENTO;TOTAL VENDIDO");
+            escritor.newLine();
 
-            for (Seller seller : sellerList) {
-
-                writer.write(
-                        seller.getFullName()
-                        + ";"
-                        + String.format(
-                                "%.2f",
-                                seller.getRevenue()
-                        )
+            for (Vendedor vendedor : lista) {
+                escritor.write(
+                    vendedor.nombreCompleto() + ";"
+                    + vendedor.tipoDocumento + " "
+                    + vendedor.numeroDocumento + ";"
+                    + String.format(java.util.Locale.US, "%.2f",
+                            vendedor.totalVendido)
                 );
-
-                writer.newLine();
+                escritor.newLine();
             }
         }
     }
 
-    /**
-     * Crea el reporte de productos.
-     *
-     * @param products productos procesados
-     * @throws IOException si ocurre un error de escritura
-     */
-    private static void createProductReport(
-            Map<Integer, Product> products)
-            throws IOException {
+    private static void generarReporteProductos(
+            Map<String, Producto> productos) throws IOException {
 
-        createReportFolder();
+        List<Producto> lista =
+                new ArrayList<Producto>(productos.values());
 
-        List<Product> productList =
-                new ArrayList<>(products.values());
-
-        productList.sort(
-                Comparator.comparingInt(
-                        Product::getQuantitySold
-                ).reversed()
-        );
-
-        File file = new File(
-                REPORT_FOLDER
-                + File.separator
-                + "reporte_productos.csv"
-        );
-
-        try (BufferedWriter writer =
-                new BufferedWriter(new FileWriter(file))) {
-
-            for (Product product : productList) {
-
-                writer.write(
-                        product.getName()
-                        + ";"
-                        + String.format(
-                                "%.2f",
-                                product.getPrice()
-                        )
-                );
-
-                writer.newLine();
+        Collections.sort(lista, new Comparator<Producto>() {
+            @Override
+            public int compare(Producto a, Producto b) {
+                return Integer.compare(b.cantidadVendida, a.cantidadVendida);
             }
-        }
-    }
+        });
 
-    /**
-     * Crea la carpeta de reportes.
-     *
-     * @throws IOException si no puede crearse
-     */
-    private static void createReportFolder()
-            throws IOException {
+        File archivo = new File(CARPETA, "reporte_productos.txt");
 
-        File folder = new File(REPORT_FOLDER);
+        try (BufferedWriter escritor =
+                new BufferedWriter(new FileWriter(archivo))) {
 
-        if (!folder.exists()
-                && !folder.mkdirs()) {
+            escritor.write("PRODUCTO;PRECIO;CANTIDAD VENDIDA");
+            escritor.newLine();
 
-            throw new IOException(
-                    "No fue posible crear la carpeta reports.");
-        }
-    }
-
-    /**
-     * Representa un vendedor.
-     */
-    private static class Seller {
-
-        private final long document;
-        private final String name;
-        private final String lastName;
-        private double revenue;
-
-        Seller(
-                long document,
-                String name,
-                String lastName) {
-
-            this.document = document;
-            this.name = name;
-            this.lastName = lastName;
-            this.revenue = 0.0;
-        }
-
-        void addRevenue(double value) {
-            revenue += value;
-        }
-
-        double getRevenue() {
-            return revenue;
-        }
-
-        String getFullName() {
-            return name + " " + lastName;
-        }
-    }
-
-    /**
-     * Representa un producto.
-     */
-    private static class Product {
-
-        private final int id;
-        private final String name;
-        private final double price;
-        private int quantitySold;
-
-        Product(
-                int id,
-                String name,
-                double price) {
-
-            this.id = id;
-            this.name = name;
-            this.price = price;
-            this.quantitySold = 0;
-        }
-
-        void addQuantity(int quantity) {
-            quantitySold += quantity;
-        }
-
-        String getName() {
-            return name;
-        }
-
-        double getPrice() {
-            return price;
-        }
-
-        int getQuantitySold() {
-            return quantitySold;
+            for (Producto producto : lista) {
+                escritor.write(
+                    producto.nombre + ";"
+                    + String.format(java.util.Locale.US, "%.2f",
+                            producto.precio) + ";"
+                    + producto.cantidadVendida
+                );
+                escritor.newLine();
+            }
         }
     }
 }
