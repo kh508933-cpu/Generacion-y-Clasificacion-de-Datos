@@ -9,4 +9,4 @@ P007;Camara;300000
 P008;Parlante;180000
 P009;Tablet;950000
 P010;MemoriaUSB;35000
-
+c
